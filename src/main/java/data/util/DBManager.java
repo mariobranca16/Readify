@@ -17,8 +17,8 @@ public class DBManager {
                     "&sslMode=REQUIRED" +
                     "&serverTimezone=UTC";
 
-    private static final String USER = "MarioBranca";
-    private static final String PASSWORD = "ProgettoReadify26";
+    private static final String USER = "MY_USER"; //da modificare
+    private static final String PASSWORD = "MY_PASSWORD"; //da modificare
 
     static {
         try {
@@ -37,7 +37,6 @@ public class DBManager {
             try {
                 conn.close();
             } catch (SQLException e) {
-                // TODO: Implementare logging appropriato
                 throw new RuntimeException("Errore durante l'operazione", e);
             }
         }
