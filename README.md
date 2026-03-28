@@ -2,7 +2,11 @@
 
 > Piattaforma web per l'acquisto di libri online, sviluppata nell'ambito del corso di **Ingegneria del Software** presso l'**Università degli Studi di Salerno**.
 
-> Progetto realizzato da **Mario Branca**, **Paolo Visconti**, **Simone Sammartano** e **Gabriele De Luca**
+> Progetto realizzato da
+> - **Mario Branca**
+> - **Paolo Visconti**
+> - **Simone Sammartano**
+> - **Gabriele De Luca**
 
 ---
 
