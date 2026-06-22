@@ -1,160 +1,67 @@
-# Readify 📚
+# Readify
 
-> Piattaforma web per l'acquisto di libri online, sviluppata nell'ambito del corso di **Ingegneria del Software** presso l'**Università degli Studi di Salerno**.
+Piattaforma web per l'acquisto di libri online, realizzata per l'esame di Ingegneria del Software presso l'Università degli Studi di Salerno.
 
-> Progetto realizzato da
-> - **Mario Branca**
-> - **Paolo Visconti**
-> - **Simone Sammartano**
-> - **Gabriele De Luca**
+Progetto di gruppo, sviluppato insieme a Paolo Visconti, Simone Sammartano e Gabriele De Luca.
 
----
+Il sistema permette di sfogliare un catalogo di libri, gestire un carrello e completare un ordine, con un'area amministrativa per il controllo di catalogo, utenti e ordini. È organizzato secondo un'architettura three-tier con dipendenze in un'unica direzione.
 
-## Stack tecnologico
+## Tecnologie
 
-| Layer        | Tecnologie                                          |
-|--------------|-----------------------------------------------------|
-| Backend      | Java 21, Jakarta Servlet API 6.1, JSTL 3.0          |
-| Frontend     | JSP, HTML/CSS, JavaScript                           |
-| Database     | MySQL (`readify`) — hostato su Microsoft Azure      |
-| Server       | Apache Tomcat 11                                    |
-| Build        | Maven (packaging WAR)                               |
-| Test         | JUnit 5, Mockito 5, JaCoCo                          |
-| Serializzaz. | Gson 2.10                                           |
-
----
+- Java 21 con Jakarta Servlet API e JSTL per il backend
+- JSP, HTML, CSS e JavaScript per il frontend
+- MySQL per il database (`readify`)
+- Apache Tomcat 11 come server
+- Maven per la build (packaging WAR)
+- JUnit 5, Mockito 5 e JaCoCo per i test
+- Gson per la serializzazione JSON
 
 ## Architettura
 
-Il sistema adotta un'architettura **three-tier** con dipendenze unidirezionali:
+Il sistema segue un'architettura three-tier:
 
 ```
-Controller → Service → DAO → Database
+Controller -> Service -> DAO -> Database
 ```
 
-- **Presentation layer** — Servlet, Filter e JSP (non accessibili direttamente)
-- **Business layer** — Service e interfacce per i casi d'uso, con pattern Facade e Observer
-- **Data layer** — DAO per l'accesso a MySQL tramite JDBC
-
----
+- livello di presentazione: servlet, filtri e JSP (queste ultime non accessibili in modo diretto)
+- livello di business: service e interfacce per i casi d'uso, con i pattern Facade e Observer
+- livello dati: DAO per l'accesso a MySQL tramite JDBC
 
 ## Funzionalità
 
-### Utente non registrato
-- Navigazione del catalogo con filtri e ricerca
-- Visualizzazione dettaglio libro e recensioni
+Utente non registrato:
 
-### Utente registrato
-- Registrazione, login e logout
-- Gestione profilo, password e indirizzi di spedizione
-- Carrello persistente e checkout con pagamento
-- Storico ordini con dettaglio e possibilità di annullamento
-- Recensioni sui libri (aggiunta, modifica, eliminazione)
+- navigazione del catalogo con filtri e ricerca
+- visualizzazione del dettaglio di un libro e delle recensioni
 
-### Amministratore
-- Dashboard con pannello di controllo
-- Gestione catalogo libri (inserimento, modifica, eliminazione)
-- Gestione utenti (visualizzazione, modifica, eliminazione)
-- Gestione ordini (visualizzazione e aggiornamento stato)
-- Moderazione recensioni
+Utente registrato:
 
----
+- registrazione, login e logout
+- gestione del profilo, della password e degli indirizzi di spedizione
+- carrello persistente e checkout con pagamento
+- storico degli ordini con dettaglio e possibilità di annullamento
+- aggiunta, modifica ed eliminazione delle recensioni
+
+Amministratore:
+
+- dashboard di controllo
+- gestione del catalogo (inserimento, modifica ed eliminazione dei libri)
+- gestione degli utenti
+- gestione degli ordini e aggiornamento del loro stato
+- moderazione delle recensioni
 
 ## Schema del database
 
-Il database `readify` include le seguenti tabelle principali:
+Il database `readify` è composto dalle seguenti tabelle principali:
 
-| Tabella             | Descrizione                                         |
-|---------------------|-----------------------------------------------------|
-| `Utente`            | Dati anagrafici, ruolo (`admin`/`registrato`), hash |
-| `Libro`             | Titolo, autore, ISBN, prezzo, disponibilità         |
-| `Categoria`         | Categorie con icona                                 |
-| `LibroCategoria`    | Relazione N:M libro–categoria                       |
-| `Indirizzo`         | Indirizzi di spedizione per utente                  |
-| `Carrello`          | Carrello persistente per utente                     |
-| `DettaglioCarrello` | Righe carrello con prezzo unitario                  |
-| `Ordine`            | Testata ordine con stato e totale                   |
-| `Contiene`          | Righe ordine con snapshot prezzo al momento         |
-| `Recensione`        | Recensioni con voto e testo                         |
-
-Stati ordine: `in_attesa` → `pagato` → `in_elaborazione` → `spedito` → `consegnato` / `annullato` / `rimborsato`
-
----
-
-## Installazione
-
-### Prerequisiti
-
-- JDK 21+
-- Apache Tomcat 11+
-- Maven 3.8+
-
-### 1. Clona il repository
-
-```bash
-git clone https://github.com/mariobranca16/Readify.git
-```
-
-### 2. Database
-
-Il database è hostato su **Microsoft Azure** e non richiede configurazione locale.
-
-Se si desidera usare un'istanza MySQL locale, importare lo schema:
-
-```sql
-source src/main/resources/readify.sql
-```
-
-Quindi aggiornare le credenziali in `src/main/java/data/util/DBManager.java`:
-
-```java
-private static final String HOST     = "MY_HOST";      // es. localhost
-private static final String DB       = "readify";
-private static final String USER     = "MY_USERNAME";  // es. root
-private static final String PASSWORD = "MY_PASSWORD";
-```
-
-> I valori `MY_HOST`, `MY_USERNAME` e `MY_PASSWORD` sono segnaposto e vanno sostituiti con le credenziali della propria istanza MySQL.
-
-### 3. Build e deploy
-
-```bash
-mvn clean package
-```
-
-Copia il file `Readify.war` generato in `target/` nella cartella `webapps/` di Tomcat, oppure configura il progetto in IntelliJ IDEA:
-
-- `Run > Edit Configurations... > + > Tomcat Server (Local)`
-- Nella sezione **Deployment** aggiungere l'artefatto WAR/Exploded
-
-### 4. Avvia l'applicazione
-
-```
-http://localhost:8080/Readify
-```
-
----
-
-## Test
-
-Il progetto include test unitari e di integrazione con JUnit 5 e Mockito:
-
-```bash
-mvn test
-```
-
-| Classe di test                     | Copertura                           |
-|------------------------------------|-------------------------------------|
-| `LoginControllerTest`              | Autenticazione utente               |
-| `RegistrazioneControllerTest`      | Validazione registrazione           |
-| `AcquistoControllerTest`           | Flusso carrello e checkout          |
-| `ModificaDatiUtenteControllerTest` | Aggiornamento profilo               |
-| `RicercaPerNomeTest`               | Ricerca nel catalogo                |
-| `ValidaIndirizzoTest`              | Validazione indirizzo spedizione    |
-| `ValidaPagamentoTest`              | Validazione dati pagamento          |
-| `ValidaRegistrazioneTest`          | Validazione form registrazione      |
-
----
+- `Utente`: dati anagrafici, ruolo (admin o registrato) e password in hash
+- `Libro`: titolo, autore, ISBN, prezzo e disponibilità
+- `Categoria` e `LibroCategoria`: categorie e relazione N:M con i libri
+- `Indirizzo`: indirizzi di spedizione per utente
+- `Carrello` e `DettaglioCarrello`: carrello persistente e relative righe
+- `Ordine` e `Contiene`: testata e righe degli ordini, con il prezzo salvato al momento dell'acquisto
+- `Recensione`: recensioni con voto e testo
 
 ## Struttura del progetto
 
@@ -162,33 +69,68 @@ mvn test
 src/
 ├── main/java/
 │   ├── presentation/
-│   │   ├── controller/       # Servlet — gestione richieste HTTP
-│   │   │   └── admin/        # Servlet area amministratore
-│   │   ├── filter/           # Filtri (autenticazione, carrello)
-│   │   └── util/             # ServletUtils, ValidatoreForm, ValidatorePagamento
+│   │   ├── controller/       servlet per la gestione delle richieste HTTP
+│   │   │   └── admin/        servlet dell'area amministratore
+│   │   ├── filter/           filtri per autenticazione e carrello
+│   │   └── util/             utilità e validazione dei form e dei pagamenti
 │   ├── business/
-│   │   ├── model/            # Entità di dominio (Libro, Utente, Ordine…)
-│   │   ├── service/          # Interfacce e implementazioni dei servizi
-│   │   │   └── catalog/observer/  # Pattern Observer (consistenza carrello)
-│   │   └── ServiceFactory.java    # Factory per i service
+│   │   ├── model/            entità di dominio (Libro, Utente, Ordine...)
+│   │   ├── service/          interfacce e implementazioni dei servizi
+│   │   └── ServiceFactory.java   factory per i service
 │   └── data/
-│       ├── dao/              # Accesso al database via JDBC
-│       └── util/             # DBManager, HashUtil
+│       ├── dao/              accesso al database via JDBC
+│       └── util/             gestione della connessione e hashing
 ├── main/resources/
-│   └── readify.sql           # Schema e dati iniziali
+│   └── readify.sql           schema e dati iniziali
 ├── main/webapp/
-│   ├── WEB-INF/jsp/          # Viste JSP (utente e admin)
-│   ├── css/                  # Fogli di stile per pagina
-│   └── js/                   # Script client (filtri, carrello, validazione)
-└── test/java/                # Test unitari e di integrazione
+│   ├── WEB-INF/jsp/          viste JSP (utente e admin)
+│   ├── css/                  fogli di stile
+│   └── js/                   script client (filtri, carrello, validazione)
+└── test/java/                test unitari e di integrazione
 ```
 
----
+## Come avviarlo
+
+Prerequisiti: JDK 21+, Apache Tomcat 11+, Maven 3.8+.
+
+1. Clonare il repository:
+
+   ```bash
+   git clone https://github.com/mariobranca16/Readify.git
+   ```
+
+2. Il database è ospitato su Microsoft Azure e non richiede configurazione locale. Per usare invece un'istanza MySQL locale, importare lo schema:
+
+   ```sql
+   source src/main/resources/readify.sql
+   ```
+
+   e aggiornare le credenziali in `src/main/java/data/util/DBManager.java` al posto dei segnaposto `MY_HOST`, `MY_USERNAME` e `MY_PASSWORD`.
+
+3. Generare il pacchetto e portarlo su Tomcat:
+
+   ```bash
+   mvn clean package
+   ```
+
+   Copiare il file `Readify.war` da `target/` nella cartella `webapps/` di Tomcat, oppure configurare il progetto dall'IDE.
+
+4. Aprire l'applicazione su `http://localhost:8080/Readify`.
+
+## Test
+
+Il progetto include test unitari e di integrazione con JUnit 5 e Mockito, eseguibili con:
+
+```bash
+mvn test
+```
+
+Coprono i flussi principali: login e registrazione, carrello e checkout, aggiornamento dei dati utente, ricerca nel catalogo e validazione di indirizzo, pagamento e form di registrazione.
 
 ## Sicurezza
 
-- Password cifrate con hash nel database (`HashUtil`)
-- Validazione lato client (`form-validation.js`) e lato server (`ValidatoreForm`, `ValidatorePagamento`)
-- Filtri servlet per controllo accessi (`AuthenticationFilter`, `CarrelloFilter`)
-- JSP non direttamente accessibili (collocate in `WEB-INF`)
-- Connessione al database Azure con SSL obbligatorio (`sslMode=REQUIRED`)
+- password cifrate con hash nel database
+- validazione degli input sia lato client sia lato server
+- filtri servlet per il controllo degli accessi
+- JSP collocate in `WEB-INF`, non raggiungibili in modo diretto
+- connessione al database Azure con SSL obbligatorio
